@@ -26,7 +26,7 @@
                     <manifest>
 
                     <!-- give full qualified name of your main class-->
-                      <mainClass>com.flaxa.interpretlox.Lox</mainClass>
+                      <mainClass>loxInterpreter.Lox</mainClass>
 
                     </manifest>
                   </archive>
