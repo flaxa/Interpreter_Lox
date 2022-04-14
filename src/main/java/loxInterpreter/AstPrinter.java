@@ -72,7 +72,13 @@ public class AstPrinter implements Expr.Visitor<String> {
         
         );
         
-        System.out.println(new AstPrinter().print(expression));
+        System.out.println(new AstPrinter().print(expression
+        ));
+    }
+
+    @Override
+    public String visitVariableExpr(Expr.Variable expr) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
     
 }
