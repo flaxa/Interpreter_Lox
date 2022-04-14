@@ -1,17 +1,21 @@
 
 package loxInterpreter;
 
+import java.util.List;
+
 /**
  *
  * @author Josh
  */
-public class Interpreter implements Expr.Visitor<Object>{
+public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void>{
 
     
-    void interpret(Expr expression){
+    void interpret(List<Stmt> statements){
         try{
-            Object value = evaluate(expression);
-            System.out.println(stringify(value));
+            for(Stmt statement : statements){
+                execute(statement);
+            
+        }
         }catch(RuntimeError error){
             Lox.runtimeError(error);
         }
@@ -35,10 +39,22 @@ public class Interpreter implements Expr.Visitor<Object>{
                 {
                     return (String)left + (String)right;
                 }
+                if(left instanceof String)
+                {
+                    return (String)left + stringify(right);
+                }
+                if(right instanceof String)
+                {
+                    return stringify(left) + (String)right;
+                }
                 throw new RuntimeError(expr.operator, "Operands must be two numbers or two strings");
                 
             case SLASH:
                 checkNumberOperand(expr.operator, left, right);
+                
+                if((double)right == 0.0){
+                    throw new RuntimeError(expr.operator, "Division by 0 is undefined");
+                }
 
                 return (double)left / (double)right;
             case STAR:
@@ -104,6 +120,10 @@ public class Interpreter implements Expr.Visitor<Object>{
         return expr.accept(this);
     }
     
+    private void execute(Stmt stmt){
+        stmt.accept(this);
+    }
+    
     private boolean isTruthy(Object object){
         
         if(object == null){
@@ -156,6 +176,20 @@ public class Interpreter implements Expr.Visitor<Object>{
         
         return value.toString();
        
+    }
+
+    @Override
+    public Void visitExpressionStmt(Stmt.Expression stmt) {
+        evaluate(stmt.expression);
+        return null;
+    }
+
+    @Override
+    public Void visitPrintStmt(Stmt.Print stmt) {
+        Object value = evaluate(stmt.expression);
+        System.out.println(stringify(value));
+        return null;
+
     }
     
     
