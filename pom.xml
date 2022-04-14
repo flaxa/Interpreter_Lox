@@ -26,7 +26,7 @@
                     <manifest>
 
                     <!-- give full qualified name of your main class-->
-                      <mainClass>loxInterpreter.Lox</mainClass>  <!-- to generate ast classes use tools.GenerateAst -->
+                      <mainClass>loxInterpreter.Lox</mainClass>  <!-- to generate ast classes use tools.GenerateAst, to generate interpreter use loxInterpreter.Lox -->
 
                     </manifest>
                   </archive>
