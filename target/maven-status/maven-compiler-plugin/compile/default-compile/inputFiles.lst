@@ -1,0 +1,12 @@
+/home/joshua/Documents/Portfolio/Interpreter_Lox/src/main/java/loxInterpreter/Enviroment.java
+/home/joshua/Documents/Portfolio/Interpreter_Lox/src/main/java/loxInterpreter/Expr.java
+/home/joshua/Documents/Portfolio/Interpreter_Lox/src/main/java/loxInterpreter/Scanner.java
+/home/joshua/Documents/Portfolio/Interpreter_Lox/src/main/java/loxInterpreter/Stmt.java
+/home/joshua/Documents/Portfolio/Interpreter_Lox/src/main/java/loxInterpreter/Token.java
+/home/joshua/Documents/Portfolio/Interpreter_Lox/src/main/java/loxInterpreter/RuntimeError.java
+/home/joshua/Documents/Portfolio/Interpreter_Lox/src/main/java/loxInterpreter/Lox.java
+/home/joshua/Documents/Portfolio/Interpreter_Lox/src/main/java/loxInterpreter/Interpreter.java
+/home/joshua/Documents/Portfolio/Interpreter_Lox/src/main/java/loxInterpreter/Parser.java
+/home/joshua/Documents/Portfolio/Interpreter_Lox/src/main/java/loxInterpreter/AstPrinter.java
+/home/joshua/Documents/Portfolio/Interpreter_Lox/src/main/java/tools/GenerateAst.java
+/home/joshua/Documents/Portfolio/Interpreter_Lox/src/main/java/loxInterpreter/TokenType.java
