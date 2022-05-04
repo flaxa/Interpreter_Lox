@@ -7,84 +7,79 @@ import java.util.List;
  *
  * @author Josh
  */
-public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void>{
+public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
 
     private Enviroment enviroment = new Enviroment();
-    void interpret(List<Stmt> statements){
-        try{
-            for(Stmt statement : statements){
+
+    void interpret(List<Stmt> statements) {
+        try {
+            for (Stmt statement : statements) {
                 execute(statement);
-            
-        }
-        }catch(RuntimeError error){
+
+            }
+        } catch (RuntimeError error) {
             Lox.runtimeError(error);
         }
     }
+
     @Override
     public Object visitBinaryExpr(Expr.Binary expr) {
         Object left = evaluate(expr.left);
         Object right = evaluate(expr.right);
-        
-        switch(expr.operator.type){
+
+        switch (expr.operator.type) {
             case MINUS:
                 checkNumberOperand(expr.operator, left, right);
 
-                return (double)left - (double)right;
+                return (double) left - (double) right;
             case PLUS:
-                if(left instanceof Double && right instanceof Double)
-                {
-                    return (double)left + (double)right;
+                if (left instanceof Double && right instanceof Double) {
+                    return (double) left + (double) right;
                 }
-                if(left instanceof String && right instanceof String)
-                {
-                    return (String)left + (String)right;
+                if (left instanceof String && right instanceof String) {
+                    return (String) left + (String) right;
                 }
-                if(left instanceof String)
-                {
-                    return (String)left + stringify(right);
+                if (left instanceof String) {
+                    return (String) left + stringify(right);
                 }
-                if(right instanceof String)
-                {
-                    return stringify(left) + (String)right;
+                if (right instanceof String) {
+                    return stringify(left) + (String) right;
                 }
                 throw new RuntimeError(expr.operator, "Operands must be two numbers or two strings");
-                
+
             case SLASH:
                 checkNumberOperand(expr.operator, left, right);
-                
-                if((double)right == 0.0){
+
+                if ((double) right == 0.0) {
                     throw new RuntimeError(expr.operator, "Division by 0 is undefined");
                 }
 
-                return (double)left / (double)right;
+                return (double) left / (double) right;
             case STAR:
                 checkNumberOperand(expr.operator, left, right);
 
-                return (double)left * (double)right;
+                return (double) left * (double) right;
             case GREATER:
-                checkNumberOperand(expr.operator, left, right); 
-                return (double)left > (double)right;
+                checkNumberOperand(expr.operator, left, right);
+                return (double) left > (double) right;
             case GREATER_EQUAL:
                 checkNumberOperand(expr.operator, left, right);
-                return (double)left >= (double)right;
+                return (double) left >= (double) right;
             case LESS:
                 checkNumberOperand(expr.operator, left, right);
-                return (double)left < (double)right;
+                return (double) left < (double) right;
             case LESS_EQUAL:
                 checkNumberOperand(expr.operator, left, right);
-                return (double)left <= (double)right;
+                return (double) left <= (double) right;
             case BANG_EQUAL:
-                return !isEqual(left,right);
+                return !isEqual(left, right);
             case EQUAL_EQUAL:
-                return isEqual(left,right);
-            
-        
+                return isEqual(left, right);
+
         }
-        
+
         return null;
-                
-                
-                
+
     }
 
     @Override
@@ -100,82 +95,97 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void>{
     @Override
     public Object visitUnaryExpr(Expr.Unary expr) {
         Object right = evaluate(expr.right);
-        
-        switch(expr.operator.type){
+
+        switch (expr.operator.type) {
             case BANG:
                 return !isTruthy(right);
-            case MINUS: 
-                checkNumberOperand(expr.operator, right);                
+            case MINUS:
+                checkNumberOperand(expr.operator, right);
 
-                return -(double)right;
+                return -(double) right;
         }
-        
-        
+
         return null;
-        
+
     }
-    
-    
-    private Object evaluate(Expr expr){
+
+    private Object evaluate(Expr expr) {
         return expr.accept(this);
     }
-    
-    private void execute(Stmt stmt){
+
+    private void execute(Stmt stmt) {
         stmt.accept(this);
     }
-    
-    private boolean isTruthy(Object object){
-        
-        if(object == null){
+
+    @Override
+    public Void visitBlockStmt(Stmt.Block stmt) {
+        executeBlock(stmt.statements, new Enviroment(enviroment));
+        return null;
+    }
+
+    void executeBlock(List<Stmt> statements, Enviroment enviroment) {
+        Enviroment previous = this.enviroment;
+        try {
+            this.enviroment = enviroment;
+            for (Stmt statement : statements) {
+                execute(statement);
+            }
+        } finally {
+            this.enviroment = previous;
+        }
+    }
+
+    private boolean isTruthy(Object object) {
+
+        if (object == null) {
             return false;
         }
-        if(object instanceof Boolean){
-            return (boolean)object;
+        if (object instanceof Boolean) {
+            return (boolean) object;
         }
         return true;
-        
+
     }
-    
-    private boolean isEqual(Object a, Object b){
-        if(a==null && b == null){
+
+    private boolean isEqual(Object a, Object b) {
+        if (a == null && b == null) {
             return true;
         }
-        if(a == null){
+        if (a == null) {
             return false;
         }
-        
+
         return a.equals(b);
     }
-    
-    private void checkNumberOperand(Token operator, Object operand){
-        if(operand instanceof Double){
+
+    private void checkNumberOperand(Token operator, Object operand) {
+        if (operand instanceof Double) {
             return;
         }
         throw new RuntimeError(operator, "Operand must be a number.");
     }
-    
-    
-    private void checkNumberOperand(Token operator, Object left, Object right){
-        if(left instanceof Double && right instanceof Double ){
+
+    private void checkNumberOperand(Token operator, Object left, Object right) {
+        if (left instanceof Double && right instanceof Double) {
             return;
         }
         throw new RuntimeError(operator, "Operands must be numbers.");
     }
-    
-    private String stringify(Object value){
-        if(value == null){
+
+    private String stringify(Object value) {
+        if (value == null) {
             return "nil";
         }
-        if(value instanceof Double){
+        if (value instanceof Double) {
             String text = value.toString();
-            if(text.endsWith(".0")){
+            if (text.endsWith(".0")) {
                 text = text.substring(0, text.length() - 2);
             }
             return text;
         }
-        
+
         return value.toString();
-       
+
     }
 
     @Override
@@ -199,29 +209,25 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void>{
 
     @Override
     public Void visitVarStmt(Stmt.Var stmt) {
-        
+
         Object value = null;
-        if(stmt.initializer != null){
+        if (stmt.initializer != null) {
             value = evaluate(stmt.initializer);
         }
-        
-        enviroment.define(stmt.name.lexeme,value);
+
+        enviroment.define(stmt.name.lexeme, value);
         return null;
 
     }
 
     @Override
     public Object visitAssignExpr(Expr.Assign expr) {
-        
-        
+
         Object value = evaluate(expr.value);
-        
+
         enviroment.assign(expr.name, value);
         return value;
-        
-        
-        
+
     }
-    
-    
+
 }
